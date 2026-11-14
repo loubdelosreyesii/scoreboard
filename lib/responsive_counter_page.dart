@@ -16,6 +16,17 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
   Color _redTeamColor = Colors.red.shade400;
   Color _blueTeamColor = Colors.blue.shade400;
 
+  final List<Color> _availableColors = [
+    Colors.red.shade400,
+    Colors.blue.shade400,
+    Colors.green.shade400,
+    Colors.yellow.shade600,
+    Colors.purple.shade400,
+    Colors.orange.shade400,
+    Colors.black87,
+    Colors.white,
+  ];
+
   final TextEditingController _redTeamController = TextEditingController(
     text: 'Team Red',
   );
@@ -96,32 +107,101 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
             ? _redTeamController.text
             : _blueTeamController.text;
 
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$teamName Settings',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+        return StatefulBuilder(
+          builder: (context, setModelState) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$teamName Settings',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    const Text('Choose Team Color'),
+
+                    const SizedBox(height: 16),
+
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: _availableColors.map((color) {
+                        final selectedColor = isLeftTeam
+                            ? _redTeamColor
+                            : _blueTeamColor;
+
+                        final isSelected = selectedColor == color;
+                        final checkColor = color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (isLeftTeam) {
+                                _redTeamColor = color;
+                              } else {
+                                _blueTeamColor = color;
+                              }
+                            });
+
+                            setModelState(() {});
+                          },
+                          borderRadius: BorderRadius.circular(24),
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                width: isSelected ? 4 : 1,
+                                color: isSelected
+                                    ? Theme.of( context).colorScheme.primary
+                                    : Colors.grey.shade400,
+                              ),
+                              boxShadow: [
+                                if (isSelected)
+                                  const BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                              ],
+                            ),
+                            child: isSelected
+                                ?  Icon(
+                                    Icons.check,
+                                    color: checkColor,
+                                    size: 24,
+                                  )
+                                : null,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+
+                    const SizedBox(height: 24),
+                  ],
                 ),
-
-                const SizedBox(height: 16),
-
-                const Text('Theme customization options coming soon.'),
-
-                const SizedBox(height: 24),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
+  }
+
+  Color _getTextColor(Color backgroundColor) {
+    return backgroundColor.computeLuminance() > 0.5
+        ? Colors.black
+        : Colors.white;
   }
 
   @override
@@ -159,6 +239,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                     _showTeamSettings(isLeftTeam: true);
                   },
                   isLeftTeam: true,
+                  textColor: _getTextColor(_redTeamColor)
                 ),
                 _CounterBox(
                   color: _blueTeamColor,
@@ -170,6 +251,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                     _showTeamSettings(isLeftTeam: false);
                   },
                   isLeftTeam: false,
+                  textColor: _getTextColor(_blueTeamColor)
                 ),
               ];
 
@@ -415,6 +497,7 @@ class _CounterBox extends StatelessWidget {
   final TextEditingController teamController;
   final VoidCallback onSettingsTap;
   final bool isLeftTeam;
+  final Color textColor;
 
   const _CounterBox({
     Key? key,
@@ -425,6 +508,7 @@ class _CounterBox extends StatelessWidget {
     required this.teamController,
     required this.onSettingsTap,
     required this.isLeftTeam,
+    required this.textColor,
   }) : super(key: key);
 
   @override
@@ -445,9 +529,9 @@ class _CounterBox extends StatelessWidget {
                   if (isLeftTeam)
                     IconButton(
                       onPressed: onSettingsTap,
-                      icon: const Icon(
+                      icon:  Icon(
                         Icons.palette_outlined,
-                        color: Colors.white,
+                        color: textColor,
                       ),
                       tooltip: 'Team Settings',
                     ),
@@ -455,15 +539,15 @@ class _CounterBox extends StatelessWidget {
                     child: TextField(
                       controller: teamController,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: textColor,
                       ),
                       decoration: InputDecoration(
                         hintText: 'Enter Team Name',
                         hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: textColor.withOpacity(0.6),
                         ),
                         border: InputBorder.none,
                       ),
@@ -472,9 +556,9 @@ class _CounterBox extends StatelessWidget {
                   if (!isLeftTeam)
                     IconButton(
                       onPressed: onSettingsTap,
-                      icon: const Icon(
+                      icon:  Icon(
                         Icons.palette_outlined,
-                        color: Colors.white,
+                        color: textColor,
                       ),
                       tooltip: 'Team Settings',
                     ),
@@ -497,7 +581,7 @@ class _CounterBox extends StatelessWidget {
                           style: TextStyle(
                             fontSize: scoreFontSize,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color:textColor,
                             shadows: const [
                               Shadow(
                                 color: Colors.black26,
