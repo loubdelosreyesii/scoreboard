@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_html/html.dart' as html;
+import 'enums/match_segment_type.dart';
 import 'models/sport_template.dart';
 import 'data/sport_templates.dart';
 
@@ -20,6 +21,11 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
 
   int _redCount = 0;
   int _blueCount = 0;
+
+  int _redSegmentsWon = 0;
+  int _blueSegmentsWon = 0;
+
+  int _currentSegment = 1;
 
   Color _redTeamColor = Colors.red.shade400;
   Color _blueTeamColor = Colors.blue.shade400;
@@ -362,7 +368,17 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                     onTap: () {
                       setState(() {
                         _selectedSport = sport;
+
+                        _redCount = 0;
+                        _blueCount = 0;
+
+                        _redSegmentsWon = 0;
+                        _blueSegmentsWon = 0;
+
+                        _currentSegment = 1;
                       });
+
+                      _timerKey.currentState?.resetTimer();
 
                       Navigator.pop(context);
                     },
@@ -377,12 +393,31 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
   }
 
   void _toggleFullscreen() {
-  if (html.document.fullscreenElement != null) {
-    html.document.exitFullscreen();
-  } else {
-    html.document.documentElement?.requestFullscreen();
+    if (html.document.fullscreenElement != null) {
+      html.document.exitFullscreen();
+    } else {
+      html.document.documentElement?.requestFullscreen();
+    }
   }
-}
+
+  String _getSegmentTitle() {
+    switch (_selectedSport.segmentType) {
+      case MatchSegmentType.sets:
+        return 'Sets';
+
+      case MatchSegmentType.quarters:
+        return 'Quarter';
+
+      case MatchSegmentType.periods:
+        return 'Period';
+
+      case MatchSegmentType.halves:
+        return 'Half';
+
+      case MatchSegmentType.none:
+        return 'Segment';
+    }
+  }
 
   Color _getTextColor(Color backgroundColor) {
     return backgroundColor.computeLuminance() > 0.5
@@ -484,19 +519,62 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
+                            horizontal: 16,
+                            vertical: 10,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Text(
-                            _selectedSport.name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _selectedSport.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _selectedSport.segmentLabel,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              if (_selectedSport.pointsToWin > 0)
+                                Text(
+                                  '${_selectedSport.pointsToWin} Points • '
+                                  'Win by ${_selectedSport.winBy}',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              const SizedBox(height: 8),
+                              if (_selectedSport.segmentType ==
+                                  MatchSegmentType.sets)
+                                Text(
+                                  'Sets: $_redSegmentsWon - $_blueSegmentsWon',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              if (_selectedSport.segmentType !=
+                                  MatchSegmentType.sets)
+                                Text(
+                                  '${_getSegmentTitle()} $_currentSegment '
+                                  'of ${_selectedSport.segmentCount}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
 
