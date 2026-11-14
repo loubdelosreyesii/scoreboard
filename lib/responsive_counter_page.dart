@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ResponsiveCounterPage extends StatefulWidget {
   const ResponsiveCounterPage({Key? key}) : super(key: key);
@@ -11,11 +12,16 @@ class ResponsiveCounterPage extends StatefulWidget {
 }
 
 class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
+  static const String _redTeamColorKey = 'red_team_color';
+  static const String _blueTeamColorKey = 'blue_team_color';
+
   int _redCount = 0;
   int _blueCount = 0;
 
   Color _redTeamColor = Colors.red.shade400;
   Color _blueTeamColor = Colors.blue.shade400;
+
+  final SharedPreferencesAsync _preferences = SharedPreferencesAsync();
 
   final List<Color> _availableColors = [
     Colors.red.shade400,
@@ -35,6 +41,46 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
     text: 'Team Blue',
   );
   final GlobalKey<_MatchTimerState> _timerKey = GlobalKey<_MatchTimerState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTeamColors();
+  }
+
+  Future<void> _loadTeamColors() async {
+    final savedRedColor = await _preferences.getInt(_redTeamColorKey);
+    final savedBlueColor = await _preferences.getInt(_blueTeamColorKey);
+
+    if (!mounted) return;
+
+    setState(() {
+      if (savedRedColor != null) {
+        _redTeamColor = Color(savedRedColor);
+      }
+
+      if (savedBlueColor != null) {
+        _blueTeamColor = Color(savedBlueColor);
+      }
+    });
+  }
+
+  Future<void> _updateTeamColor({
+    required bool isLeftTeam,
+    required Color color,
+  }) async {
+    setState(() {
+      if (isLeftTeam) {
+        _redTeamColor = color;
+      } else {
+        _blueTeamColor = color;
+      }
+    });
+
+    final preferenceKey = isLeftTeam ? _redTeamColorKey : _blueTeamColorKey;
+
+    await _preferences.setInt(preferenceKey, color.toARGB32());
+  }
 
   void _incrementRed() {
     setState(() {
@@ -147,14 +193,11 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                             : Colors.white;
 
                         return InkWell(
-                          onTap: () {
-                            setState(() {
-                              if (isLeftTeam) {
-                                _redTeamColor = color;
-                              } else {
-                                _blueTeamColor = color;
-                              }
-                            });
+                          onTap: () async {
+                            await _updateTeamColor(
+                              isLeftTeam: isLeftTeam,
+                              color: color,
+                            );
 
                             setModelState(() {});
                           },
@@ -224,17 +267,15 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                                   child: const Text('Cancel'),
                                 ),
                                 ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      if (isLeftTeam) {
-                                        _redTeamColor = pickerColor;
-                                      } else {
-                                        _blueTeamColor = pickerColor;
-                                      }
-                                    });
+                                  onPressed: () async {
+                                    await _updateTeamColor(
+                                      isLeftTeam: isLeftTeam,
+                                      color: pickerColor,
+                                    );
+
+                                    if (!dialogContext.mounted) return;
 
                                     setModelState(() {});
-
                                     Navigator.pop(dialogContext);
                                   },
                                   child: const Text('Apply'),
@@ -243,6 +284,29 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                             );
                           },
                         );
+                      },
+                    ),
+                    const Divider(),
+
+                    ListTile(
+                      leading: const Icon(Icons.restart_alt),
+                      title: const Text('Reset to Default'),
+                      subtitle: Text(
+                        isLeftTeam
+                            ? 'Restore the original red color'
+                            : 'Restore the original blue color',
+                      ),
+                      onTap: () async {
+                        final defaultColor = isLeftTeam
+                            ? Colors.red.shade400
+                            : Colors.blue.shade400;
+
+                        await _updateTeamColor(
+                          isLeftTeam: isLeftTeam,
+                          color: defaultColor,
+                        );
+
+                        setModelState(() {});
                       },
                     ),
                   ],
