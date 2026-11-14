@@ -87,6 +87,43 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
     );
   }
 
+  void _showTeamSettings({required bool isLeftTeam}) {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        final teamName = isLeftTeam
+            ? _redTeamController.text
+            : _blueTeamController.text;
+
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$teamName Settings',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                const Text('Theme customization options coming soon.'),
+
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _redTeamController.dispose();
@@ -119,8 +156,9 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                   onLongPress: _decrementRed,
                   teamController: _redTeamController,
                   onSettingsTap: () {
-                    debugPrint('Red team settings tapped');
+                    _showTeamSettings(isLeftTeam: true);
                   },
+                  isLeftTeam: true,
                 ),
                 _CounterBox(
                   color: _blueTeamColor,
@@ -129,8 +167,9 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                   onLongPress: _decrementBlue,
                   teamController: _blueTeamController,
                   onSettingsTap: () {
-                    debugPrint('Blue team settings tapped');
+                    _showTeamSettings(isLeftTeam: false);
                   },
+                  isLeftTeam: false,
                 ),
               ];
 
@@ -375,6 +414,7 @@ class _CounterBox extends StatelessWidget {
   final VoidCallback onLongPress;
   final TextEditingController teamController;
   final VoidCallback onSettingsTap;
+  final bool isLeftTeam;
 
   const _CounterBox({
     Key? key,
@@ -384,6 +424,7 @@ class _CounterBox extends StatelessWidget {
     required this.onLongPress,
     required this.teamController,
     required this.onSettingsTap,
+    required this.isLeftTeam,
   }) : super(key: key);
 
   @override
@@ -401,7 +442,16 @@ class _CounterBox extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Flexible(
+                  if (isLeftTeam)
+                    IconButton(
+                      onPressed: onSettingsTap,
+                      icon: const Icon(
+                        Icons.palette_outlined,
+                        color: Colors.white,
+                      ),
+                      tooltip: 'Team Settings',
+                    ),
+                  Expanded(
                     child: TextField(
                       controller: teamController,
                       textAlign: TextAlign.center,
@@ -419,14 +469,15 @@ class _CounterBox extends StatelessWidget {
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: onSettingsTap,
-                    icon: const Icon(
-                      Icons.palette_outlined,
-                      color: Colors.white,
+                  if (!isLeftTeam)
+                    IconButton(
+                      onPressed: onSettingsTap,
+                      icon: const Icon(
+                        Icons.palette_outlined,
+                        color: Colors.white,
+                      ),
+                      tooltip: 'Team Settings',
                     ),
-                    tooltip: 'Team Settings',
-                  ),
                 ],
               ),
             ),
