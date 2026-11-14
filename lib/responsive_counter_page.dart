@@ -13,9 +13,17 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
   int _redCount = 0;
   int _blueCount = 0;
 
-  final TextEditingController _redTeamController = TextEditingController(text: 'Team Red');
-  final TextEditingController _blueTeamController = TextEditingController(text: 'Team Blue');
+  Color _redTeamColor = Colors.red.shade400;
+  Color _blueTeamColor = Colors.blue.shade400;
+
+  final TextEditingController _redTeamController = TextEditingController(
+    text: 'Team Red',
+  );
+  final TextEditingController _blueTeamController = TextEditingController(
+    text: 'Team Blue',
+  );
   final GlobalKey<_MatchTimerState> _timerKey = GlobalKey<_MatchTimerState>();
+
   void _incrementRed() {
     setState(() {
       _redCount++;
@@ -45,41 +53,39 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
   }
 
   void _resetScores() {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Reset Scoreboard'),
-      content: const Text(
-        'Are you sure you want to reset both scores to zero?',
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Scoreboard'),
+        content: const Text(
+          'Are you sure you want to reset both scores to zero?',
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-          onPressed: () {
-            Navigator.pop(context);
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
 
-            setState(() {
-              _redCount = 0;
-              _blueCount = 0;
-            });
-            _timerKey.currentState?.resetTimer();
-          },
-          child: const Text('Reset'),
-        ),
-      ],
-    ),
-  );
-}
+              setState(() {
+                _redCount = 0;
+                _blueCount = 0;
+              });
+              _timerKey.currentState?.resetTimer();
+            },
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -99,7 +105,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
         child: const Icon(Icons.refresh, size: 30),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      
+
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SafeArea(
@@ -107,18 +113,24 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
             builder: (context, orientation) {
               final children = [
                 _CounterBox(
-                  color: Colors.red.shade400,
+                  color: _redTeamColor,
                   count: _redCount,
                   onTap: _incrementRed,
                   onLongPress: _decrementRed,
                   teamController: _redTeamController,
+                  onSettingsTap: () {
+                    debugPrint('Red team settings tapped');
+                  },
                 ),
                 _CounterBox(
-                  color: Colors.blue.shade400,
+                  color: _blueTeamColor,
                   count: _blueCount,
                   onTap: _incrementBlue,
                   onLongPress: _decrementBlue,
                   teamController: _blueTeamController,
+                  onSettingsTap: () {
+                    debugPrint('Blue team settings tapped');
+                  },
                 ),
               ];
 
@@ -127,7 +139,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                   orientation == Orientation.portrait
                       ? Column(children: children)
                       : Row(children: children),
-                      
+
                   Align(
                     alignment: orientation == Orientation.portrait
                         ? Alignment.center
@@ -136,7 +148,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                       padding: EdgeInsets.only(
                         top: orientation == Orientation.landscape ? 24.0 : 0,
                       ),
-                      child: _MatchTimer(key:_timerKey),
+                      child: _MatchTimer(key: _timerKey),
                     ),
                   ),
                 ],
@@ -163,7 +175,7 @@ class _MatchTimerState extends State<_MatchTimer> {
   int _seconds = 0;
   Timer? _timer;
   bool _isRunning = false;
-  
+
   bool _isCountdown = false;
   int _countdownMinutes = 10;
 
@@ -176,6 +188,7 @@ class _MatchTimerState extends State<_MatchTimer> {
   void resetTimer() {
     _resetTimer();
   }
+
   void _initializeTime() {
     _seconds = _isCountdown ? _countdownMinutes * 60 : 0;
   }
@@ -227,7 +240,9 @@ class _MatchTimerState extends State<_MatchTimer> {
           builder: (context, setDialogState) {
             return AlertDialog(
               title: const Text('Timer Settings'),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               // Wrap the Column in SingleChildScrollView to prevent overflow!
               content: SingleChildScrollView(
                 child: Column(
@@ -235,7 +250,9 @@ class _MatchTimerState extends State<_MatchTimer> {
                   children: [
                     SwitchListTile(
                       title: const Text('Countdown Mode'),
-                      subtitle: Text(_isCountdown ? 'Counting down' : 'Counting up'),
+                      subtitle: Text(
+                        _isCountdown ? 'Counting down' : 'Counting up',
+                      ),
                       value: _isCountdown,
                       onChanged: (value) {
                         setDialogState(() => _isCountdown = value);
@@ -259,7 +276,9 @@ class _MatchTimerState extends State<_MatchTimer> {
                         divisions: 89,
                         label: '$_countdownMinutes min',
                         onChanged: (value) {
-                          setDialogState(() => _countdownMinutes = value.toInt());
+                          setDialogState(
+                            () => _countdownMinutes = value.toInt(),
+                          );
                           setState(() {
                             _countdownMinutes = value.toInt();
                             _resetTimer();
@@ -306,7 +325,12 @@ class _MatchTimerState extends State<_MatchTimer> {
               bottomLeft: Radius.circular(30),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(left: 20, right: 12, top: 12, bottom: 12),
+              padding: const EdgeInsets.only(
+                left: 20,
+                right: 12,
+                top: 12,
+                bottom: 12,
+              ),
               child: Row(
                 children: [
                   Icon(
@@ -328,11 +352,7 @@ class _MatchTimerState extends State<_MatchTimer> {
               ),
             ),
           ),
-          Container(
-            height: 32,
-            width: 1,
-            color: Colors.white30,
-          ),
+          Container(height: 32, width: 1, color: Colors.white30),
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white70),
             onPressed: _openSettings,
@@ -354,6 +374,7 @@ class _CounterBox extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onLongPress;
   final TextEditingController teamController;
+  final VoidCallback onSettingsTap;
 
   const _CounterBox({
     Key? key,
@@ -362,6 +383,7 @@ class _CounterBox extends StatelessWidget {
     required this.onTap,
     required this.onLongPress,
     required this.teamController,
+    required this.onSettingsTap,
   }) : super(key: key);
 
   @override
@@ -372,20 +394,40 @@ class _CounterBox extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 24.0, left: 16.0, right: 16.0),
-              child: TextField(
-                controller: teamController,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Enter Team Name',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
-                  border: InputBorder.none,
-                ),
+              padding: const EdgeInsets.only(
+                top: 24.0,
+                left: 16.0,
+                right: 16.0,
+              ),
+              child: Row(
+                children: [
+                  Flexible(
+                    child: TextField(
+                      controller: teamController,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Enter Team Name',
+                        hintStyle: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                        ),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: onSettingsTap,
+                    icon: const Icon(
+                      Icons.palette_outlined,
+                      color: Colors.white,
+                    ),
+                    tooltip: 'Team Settings',
+                  ),
+                ],
               ),
             ),
             Expanded(
@@ -393,31 +435,31 @@ class _CounterBox extends StatelessWidget {
                 onTap: onTap,
                 onLongPress: onLongPress,
                 child: LayoutBuilder(
-  builder: (context, constraints) {
-    final scoreFontSize = constraints.maxWidth * 0.75;
+                  builder: (context, constraints) {
+                    final scoreFontSize = constraints.maxWidth * 0.75;
 
-    return Center(
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          '$count',
-          style: TextStyle(
-            fontSize: scoreFontSize,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            shadows: const [
-              Shadow(
-                color: Colors.black26,
-                blurRadius: 10,
-                offset: Offset(2, 2),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  },
-),
+                    return Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          '$count',
+                          style: TextStyle(
+                            fontSize: scoreFontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: const [
+                              Shadow(
+                                color: Colors.black26,
+                                blurRadius: 10,
+                                offset: Offset(2, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ],
