@@ -3,6 +3,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:universal_html/html.dart' as html;
+import 'models/sport_template.dart';
+import 'data/sport_templates.dart';
 
 class ResponsiveCounterPage extends StatefulWidget {
   const ResponsiveCounterPage({Key? key}) : super(key: key);
@@ -20,6 +23,15 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
 
   Color _redTeamColor = Colors.red.shade400;
   Color _blueTeamColor = Colors.blue.shade400;
+
+  SportTemplate _selectedSport = tableTennisTemplate;
+
+  final List<SportTemplate> _sportTemplates = [
+    tableTennisTemplate,
+    badmintonTemplate,
+    volleyballTemplate,
+    basketballTemplate,
+  ];
 
   final SharedPreferencesAsync _preferences = SharedPreferencesAsync();
 
@@ -319,6 +331,59 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
     );
   }
 
+  void _showSportTemplateDialog() {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Select Sport',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+
+                const SizedBox(height: 16),
+
+                ..._sportTemplates.map(
+                  (sport) => ListTile(
+                    title: Text(sport.name),
+
+                    subtitle: Text(sport.segmentLabel),
+
+                    trailing: _selectedSport == sport
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : null,
+
+                    onTap: () {
+                      setState(() {
+                        _selectedSport = sport;
+                      });
+
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _toggleFullscreen() {
+  if (html.document.fullscreenElement != null) {
+    html.document.exitFullscreen();
+  } else {
+    html.document.documentElement?.requestFullscreen();
+  }
+}
+
   Color _getTextColor(Color backgroundColor) {
     return backgroundColor.computeLuminance() > 0.5
         ? Colors.black
@@ -335,12 +400,40 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: _resetScores,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        tooltip: 'Reset Scores',
-        child: const Icon(Icons.refresh, size: 30),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            heroTag: 'sports',
+            onPressed: _showSportTemplateDialog,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black87,
+            tooltip: 'Select Sport',
+            child: const Icon(Icons.sports),
+          ),
+
+          const SizedBox(height: 12),
+
+          FloatingActionButton(
+            heroTag: 'fullscreen',
+            onPressed: _toggleFullscreen,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black87,
+            tooltip: 'Fullscreen',
+            child: const Icon(Icons.fullscreen),
+          ),
+
+          const SizedBox(height: 12),
+
+          FloatingActionButton(
+            heroTag: 'reset',
+            onPressed: _resetScores,
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black87,
+            tooltip: 'Reset Scores',
+            child: const Icon(Icons.refresh),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
 
@@ -386,11 +479,31 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                     alignment: orientation == Orientation.portrait
                         ? Alignment.center
                         : Alignment.topCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: orientation == Orientation.landscape ? 24.0 : 0,
-                      ),
-                      child: _MatchTimer(key: _timerKey),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            _selectedSport.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        _MatchTimer(key: _timerKey),
+                      ],
                     ),
                   ),
                 ],
