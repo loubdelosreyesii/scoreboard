@@ -392,23 +392,32 @@ class _CounterBox extends StatelessWidget {
               child: InkWell(
                 onTap: onTap,
                 onLongPress: onLongPress,
-                child: Center(
-                  child: Text(
-                    '$count',
-                    style: const TextStyle(
-                      fontSize: 120,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black26,
-                          blurRadius: 10,
-                          offset: Offset(2, 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                child: LayoutBuilder(
+  builder: (context, constraints) {
+    final scoreFontSize = constraints.maxWidth * 0.75;
+
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          '$count',
+          style: TextStyle(
+            fontSize: scoreFontSize,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            shadows: const [
+              Shadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                offset: Offset(2, 2),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  },
+),
               ),
             ),
           ],
