@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ResponsiveCounterPage extends StatefulWidget {
   const ResponsiveCounterPage({Key? key}) : super(key: key);
@@ -107,6 +108,8 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
             ? _redTeamController.text
             : _blueTeamController.text;
 
+        Color pickerColor = isLeftTeam ? _redTeamColor : _blueTeamColor;
+
         return StatefulBuilder(
           builder: (context, setModelState) {
             return SafeArea(
@@ -139,7 +142,9 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                             : _blueTeamColor;
 
                         final isSelected = selectedColor == color;
-                        final checkColor = color.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+                        final checkColor = color.computeLuminance() > 0.5
+                            ? Colors.black
+                            : Colors.white;
 
                         return InkWell(
                           onTap: () {
@@ -163,7 +168,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                               border: Border.all(
                                 width: isSelected ? 4 : 1,
                                 color: isSelected
-                                    ? Theme.of( context).colorScheme.primary
+                                    ? Theme.of(context).colorScheme.primary
                                     : Colors.grey.shade400,
                               ),
                               boxShadow: [
@@ -176,11 +181,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                               ],
                             ),
                             child: isSelected
-                                ?  Icon(
-                                    Icons.check,
-                                    color: checkColor,
-                                    size: 24,
-                                  )
+                                ? Icon(Icons.check, color: checkColor, size: 24)
                                 : null,
                           ),
                         );
@@ -188,6 +189,62 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                     ),
 
                     const SizedBox(height: 24),
+                    Divider(),
+                    const SizedBox(height: 16),
+
+                    ListTile(
+                      leading: const Icon(Icons.palette),
+                      title: const Text('Custom Color'),
+                      subtitle: const Text('Choose any color'),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            return AlertDialog(
+                              title: const Text('Choose Team Color'),
+                              content: StatefulBuilder(
+                                builder: (context, setPickerState) {
+                                  return SingleChildScrollView(
+                                    child: ColorPicker(
+                                      pickerColor: pickerColor,
+                                      onColorChanged: (color) {
+                                        setPickerState(() {
+                                          pickerColor = color;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(dialogContext);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isLeftTeam) {
+                                        _redTeamColor = pickerColor;
+                                      } else {
+                                        _blueTeamColor = pickerColor;
+                                      }
+                                    });
+
+                                    setModelState(() {});
+
+                                    Navigator.pop(dialogContext);
+                                  },
+                                  child: const Text('Apply'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -239,7 +296,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                     _showTeamSettings(isLeftTeam: true);
                   },
                   isLeftTeam: true,
-                  textColor: _getTextColor(_redTeamColor)
+                  textColor: _getTextColor(_redTeamColor),
                 ),
                 _CounterBox(
                   color: _blueTeamColor,
@@ -251,7 +308,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                     _showTeamSettings(isLeftTeam: false);
                   },
                   isLeftTeam: false,
-                  textColor: _getTextColor(_blueTeamColor)
+                  textColor: _getTextColor(_blueTeamColor),
                 ),
               ];
 
@@ -529,10 +586,7 @@ class _CounterBox extends StatelessWidget {
                   if (isLeftTeam)
                     IconButton(
                       onPressed: onSettingsTap,
-                      icon:  Icon(
-                        Icons.palette_outlined,
-                        color: textColor,
-                      ),
+                      icon: Icon(Icons.palette_outlined, color: textColor),
                       tooltip: 'Team Settings',
                     ),
                   Expanded(
@@ -546,9 +600,7 @@ class _CounterBox extends StatelessWidget {
                       ),
                       decoration: InputDecoration(
                         hintText: 'Enter Team Name',
-                        hintStyle: TextStyle(
-                          color: textColor.withOpacity(0.6),
-                        ),
+                        hintStyle: TextStyle(color: textColor.withOpacity(0.6)),
                         border: InputBorder.none,
                       ),
                     ),
@@ -556,10 +608,7 @@ class _CounterBox extends StatelessWidget {
                   if (!isLeftTeam)
                     IconButton(
                       onPressed: onSettingsTap,
-                      icon:  Icon(
-                        Icons.palette_outlined,
-                        color: textColor,
-                      ),
+                      icon: Icon(Icons.palette_outlined, color: textColor),
                       tooltip: 'Team Settings',
                     ),
                 ],
@@ -581,7 +630,7 @@ class _CounterBox extends StatelessWidget {
                           style: TextStyle(
                             fontSize: scoreFontSize,
                             fontWeight: FontWeight.bold,
-                            color:textColor,
+                            color: textColor,
                             shadows: const [
                               Shadow(
                                 color: Colors.black26,
