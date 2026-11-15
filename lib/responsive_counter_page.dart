@@ -27,6 +27,8 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
 
   int _currentSegment = 1;
 
+  String? _matchWinner;
+
   Color _redTeamColor = Colors.red.shade400;
   Color _blueTeamColor = Colors.blue.shade400;
 
@@ -425,6 +427,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
         : Colors.white;
   }
 
+
   @override
   void dispose() {
     _redTeamController.dispose();
@@ -470,7 +473,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
