@@ -24,6 +24,8 @@ class MatchTimerState extends State<MatchTimer> {
   bool _isCountdown = false;
   int _countdownMinutes = 10;
 
+  bool get isRunning => _isRunning;
+
   @override
   void initState() {
     super.initState();

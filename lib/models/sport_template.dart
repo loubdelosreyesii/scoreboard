@@ -15,10 +15,21 @@ class SportTemplate {
     required this.segmentType,
   });
 
+  SportTemplate copyWith({int? segmentCount}) {
+    return SportTemplate(
+      name: name,
+      pointsToWin: pointsToWin,
+      winBy: winBy,
+      segmentCount: segmentCount ?? this.segmentCount,
+      segmentType: segmentType,
+    );
+  }
+
   String get segmentLabel {
     switch (segmentType) {
       case MatchSegmentType.sets:
-        return 'Best of $segmentCount Sets';
+        final setLabel = segmentCount == 1 ? 'Set' : 'Sets';
+        return 'Best of $segmentCount $setLabel';
 
       case MatchSegmentType.quarters:
         return '$segmentCount Quarters';

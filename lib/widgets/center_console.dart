@@ -70,6 +70,10 @@ class CenterConsole extends StatelessWidget {
       return selectedSport.segmentLabel;
     }
 
+    if (selectedSport.segmentType == MatchSegmentType.sets) {
+      return selectedSport.segmentLabel;
+    }
+
     return 'Best of ${selectedSport.segmentCount} $_segmentPlural';
   }
 
@@ -95,12 +99,12 @@ class CenterConsole extends StatelessWidget {
         left: false,
         right: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
           child: Column(
             children: [
               _buildSportHeader(),
 
-              const SizedBox(height: 5),
+              const SizedBox(height: 3),
 
               Text(
                 _rulesText,
@@ -113,15 +117,15 @@ class CenterConsole extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 6),
 
               _buildCurrentSegmentBanner(),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
 
               _buildScoreSummary(),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 6),
 
               MatchTimer(
                 key: timerKey,
@@ -129,11 +133,11 @@ class CenterConsole extends StatelessWidget {
                 onResetTap: onResetTap,
               ),
 
-              const SizedBox(height: 11),
+              const SizedBox(height: 7),
 
               Container(height: 1, color: const Color(0xFF47606F)),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
 
               Align(
                 alignment: Alignment.centerLeft,
@@ -147,11 +151,11 @@ class CenterConsole extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
 
               Expanded(child: _buildHistoryTable(visibleSegmentCount)),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 6),
 
               _buildConsoleActions(),
             ],

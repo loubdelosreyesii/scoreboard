@@ -24,6 +24,8 @@ void main() {
 
     expect(find.text('0'), findsNWidgets(2));
 
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    await tester.pump();
     await tester.tapAt(const Offset(200, 400));
     await tester.pump();
 

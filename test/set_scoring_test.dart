@@ -10,6 +10,28 @@ void main() {
         InMemorySharedPreferencesAsync.empty();
   });
 
+  testWidgets('score taps require the timer to be running', (tester) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 0.5;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(const MaterialApp(home: ResponsiveCounterPage()));
+
+    await tester.tapAt(const Offset(200, 400));
+    await tester.pump();
+    expect(find.text('Start the timer to begin scoring.'), findsOneWidget);
+    expect(find.text('0'), findsNWidgets(2));
+
+    await _startTimer(tester);
+    await tester.tapAt(const Offset(200, 400));
+    await tester.pump();
+    expect(find.text('1'), findsOneWidget);
+    expect(find.text('0'), findsOneWidget);
+  });
+
   testWidgets('timer reset control runs the scoreboard reset flow', (
     tester,
   ) async {
@@ -21,6 +43,7 @@ void main() {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
     await tester.pumpWidget(const MaterialApp(home: ResponsiveCounterPage()));
+    await _startTimer(tester);
 
     await _tapScore(tester, const Offset(200, 400), 11);
     expect(find.text('SET 2 OF 5'), findsOneWidget);
@@ -48,6 +71,7 @@ void main() {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
     await tester.pumpWidget(const MaterialApp(home: ResponsiveCounterPage()));
+    await _startTimer(tester);
 
     const leftScorePosition = Offset(200, 400);
     const rightScorePosition = Offset(1000, 400);
@@ -92,6 +116,7 @@ void main() {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
     await tester.pumpWidget(const MaterialApp(home: ResponsiveCounterPage()));
+    await _startTimer(tester);
 
     const leftScorePosition = Offset(200, 400);
     const rightScorePosition = Offset(1000, 400);
@@ -118,4 +143,9 @@ Future<void> _tapScore(WidgetTester tester, Offset position, int count) async {
     await tester.tapAt(position);
     await tester.pump();
   }
+}
+
+Future<void> _startTimer(WidgetTester tester) async {
+  await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+  await tester.pump();
 }

@@ -10,6 +10,7 @@ import 'widgets/counter_box.dart';
 import 'widgets/match_timer.dart';
 import 'widgets/sport_selection_sheet.dart';
 import 'widgets/team_color_settings_sheet.dart';
+import 'widgets/title_header.dart';
 
 class ResponsiveCounterPage extends StatefulWidget {
   const ResponsiveCounterPage({super.key});
@@ -104,8 +105,18 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
     await _preferences.setInt(preferenceKey, color.toARGB32());
   }
 
+  void _showStartTimerPrompt() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Start the timer to begin scoring.')),
+    );
+  }
+
   void _incrementRed() {
     if (_isMatchComplete) return;
+    if (_timerKey.currentState?.isRunning != true) {
+      _showStartTimerPrompt();
+      return;
+    }
 
     setState(() {
       _redCount++;
@@ -115,6 +126,10 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
 
   void _incrementBlue() {
     if (_isMatchComplete) return;
+    if (_timerKey.currentState?.isRunning != true) {
+      _showStartTimerPrompt();
+      return;
+    }
 
     setState(() {
       _blueCount++;
@@ -140,6 +155,15 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
     } else {
       _reopenLastSetForCorrection(isLeftTeam: false);
     }
+  }
+
+  void _clearMatchState() {
+    _redCount = 0;
+    _blueCount = 0;
+    _redSegmentsWon = 0;
+    _blueSegmentsWon = 0;
+    _currentSegment = 1;
+    _completedSegments.clear();
   }
 
   bool get _isMatchComplete {
@@ -238,14 +262,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
             onPressed: () {
               Navigator.pop(context);
 
-              setState(() {
-                _redCount = 0;
-                _blueCount = 0;
-                _redSegmentsWon = 0;
-                _blueSegmentsWon = 0;
-                _currentSegment = 1;
-                _completedSegments.clear();
-              });
+              setState(_clearMatchState);
               _timerKey.currentState?.resetTimer();
             },
             child: const Text('Reset'),
@@ -282,21 +299,73 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
       builder: (context) => SportSelectionSheet(
         sportTemplates: _sportTemplates,
         selectedSport: _selectedSport,
+        onSegmentCountChanged: _changeSportSegmentCount,
         onSportSelected: (sport) {
           setState(() {
             _selectedSport = sport;
-            _redCount = 0;
-            _blueCount = 0;
-            _redSegmentsWon = 0;
-            _blueSegmentsWon = 0;
-            _currentSegment = 1;
-            _completedSegments.clear();
+            _clearMatchState();
           });
 
           _timerKey.currentState?.resetTimer();
         },
       ),
     );
+  }
+
+  Future<bool> _changeSportSegmentCount(
+    SportTemplate sport,
+    int segmentCount,
+  ) async {
+    final isSelectedSport = _selectedSport.name == sport.name;
+    if (isSelectedSport) {
+      final shouldReset = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Change Number of Sets?'),
+          content: const Text(
+            'Changing the number of sets will reset the current scores, '
+            'set history, and timer.',
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Change & Reset'),
+            ),
+          ],
+        ),
+      );
+      if (shouldReset != true) return false;
+    }
+
+    if (!mounted) return false;
+
+    final updatedSport = sport.copyWith(segmentCount: segmentCount);
+    final sportIndex = _sportTemplates.indexWhere(
+      (template) => template.name == sport.name,
+    );
+    setState(() {
+      _sportTemplates[sportIndex] = updatedSport;
+      if (isSelectedSport) {
+        _selectedSport = updatedSport;
+        _clearMatchState();
+      }
+    });
+    if (isSelectedSport) {
+      _timerKey.currentState?.resetTimer();
+    }
+
+    return true;
   }
 
   void _toggleFullscreen() {
@@ -469,117 +538,124 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SafeArea(
-          child: OrientationBuilder(
-            builder: (context, orientation) {
-              if (orientation == Orientation.landscape) {
-                return _buildLandscapeLayout();
-              }
+          child: Column(
+            children: [
+              const TitleHeader(),
+              Expanded(
+                child: OrientationBuilder(
+                  builder: (context, orientation) {
+                    if (orientation == Orientation.landscape) {
+                      return _buildLandscapeLayout();
+                    }
 
-              final portraitChildren = [
-                CounterBox(
-                  color: _redTeamColor,
-                  count: _redCount,
-                  onTap: _incrementRed,
-                  onLongPress: _decrementRed,
-                  teamController: _redTeamController,
-                  onSettingsTap: () {
-                    _showTeamSettings(isLeftTeam: true);
-                  },
-                  isLeftTeam: true,
-                  textColor: _getTextColor(_redTeamColor),
-                ),
-                CounterBox(
-                  color: _blueTeamColor,
-                  count: _blueCount,
-                  onTap: _incrementBlue,
-                  onLongPress: _decrementBlue,
-                  teamController: _blueTeamController,
-                  onSettingsTap: () {
-                    _showTeamSettings(isLeftTeam: false);
-                  },
-                  isLeftTeam: false,
-                  textColor: _getTextColor(_blueTeamColor),
-                ),
-              ];
+                    final portraitChildren = [
+                      CounterBox(
+                        color: _redTeamColor,
+                        count: _redCount,
+                        onTap: _incrementRed,
+                        onLongPress: _decrementRed,
+                        teamController: _redTeamController,
+                        onSettingsTap: () {
+                          _showTeamSettings(isLeftTeam: true);
+                        },
+                        isLeftTeam: true,
+                        textColor: _getTextColor(_redTeamColor),
+                      ),
+                      CounterBox(
+                        color: _blueTeamColor,
+                        count: _blueCount,
+                        onTap: _incrementBlue,
+                        onLongPress: _decrementBlue,
+                        teamController: _blueTeamController,
+                        onSettingsTap: () {
+                          _showTeamSettings(isLeftTeam: false);
+                        },
+                        isLeftTeam: false,
+                        textColor: _getTextColor(_blueTeamColor),
+                      ),
+                    ];
 
-              // Keep the existing portrait design unchanged.
-              return Stack(
-                children: [
-                  Column(children: portraitChildren),
-
-                  Align(
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                    // Keep the existing portrait design unchanged.
+                    return Stack(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                        Column(children: portraitChildren),
+
+                        Align(
+                          alignment: Alignment.center,
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                _selectedSport.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      _selectedSport.name,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      _selectedSport.segmentLabel,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    if (_selectedSport.pointsToWin > 0)
+                                      Text(
+                                        '${_selectedSport.pointsToWin} Points • '
+                                        'Win by ${_selectedSport.winBy}',
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    const SizedBox(height: 8),
+                                    if (_selectedSport.segmentType ==
+                                        MatchSegmentType.sets)
+                                      Text(
+                                        'Sets: $_redSegmentsWon - $_blueSegmentsWon',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    if (_selectedSport.segmentType !=
+                                        MatchSegmentType.sets)
+                                      Text(
+                                        '${_getSegmentTitle()} $_currentSegment '
+                                        'of ${_selectedSport.segmentCount}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _selectedSport.segmentLabel,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              if (_selectedSport.pointsToWin > 0)
-                                Text(
-                                  '${_selectedSport.pointsToWin} Points • '
-                                  'Win by ${_selectedSport.winBy}',
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
                               const SizedBox(height: 8),
-                              if (_selectedSport.segmentType ==
-                                  MatchSegmentType.sets)
-                                Text(
-                                  'Sets: $_redSegmentsWon - $_blueSegmentsWon',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              if (_selectedSport.segmentType !=
-                                  MatchSegmentType.sets)
-                                Text(
-                                  '${_getSegmentTitle()} $_currentSegment '
-                                  'of ${_selectedSport.segmentCount}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                              MatchTimer(key: _timerKey),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        MatchTimer(key: _timerKey),
                       ],
-                    ),
-                  ),
-                ],
-              );
-            },
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
