@@ -10,6 +10,33 @@ void main() {
         InMemorySharedPreferencesAsync.empty();
   });
 
+  testWidgets('timer reset control runs the scoreboard reset flow', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 0.5;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(const MaterialApp(home: ResponsiveCounterPage()));
+
+    await _tapScore(tester, const Offset(200, 400), 11);
+    expect(find.text('SET 2 OF 5'), findsOneWidget);
+    expect(find.text('11 - 0'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.restart_alt_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Reset Scoreboard'), findsOneWidget);
+    await tester.tap(find.text('Reset'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('SET 1 OF 5'), findsOneWidget);
+    expect(find.text('11 - 0'), findsNothing);
+  });
+
   testWidgets('sets use first-to-11 and win-by-2 rules with side winners', (
     tester,
   ) async {
