@@ -53,59 +53,61 @@ class _SportSelectionSheetState extends State<SportSelectionSheet> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Select Sport',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ..._sportTemplates.map(
-              (sport) => ListTile(
-                title: Text(sport.name),
-                subtitle: Text(sport.segmentLabel),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (sport.segmentType == MatchSegmentType.sets) ...[
-                      const Tooltip(
-                        message: 'Number of sets',
-                        child: Text('Sets'),
-                      ),
-                      DropdownButton<int>(
-                        key: ValueKey('set-count-${sport.name}'),
-                        value: sport.segmentCount,
-                        isDense: true,
-                        underline: const SizedBox.shrink(),
-                        items: _availableSetCounts
-                            .map(
-                              (count) => DropdownMenuItem(
-                                value: count,
-                                child: Text('$count'),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (count) {
-                          if (count != null) {
-                            _changeSegmentCount(sport, count);
-                          }
-                        },
-                      ),
-                    ],
-                    if (widget.selectedSport.name == sport.name)
-                      const Icon(Icons.check_circle, color: Colors.green),
-                  ],
-                ),
-                onTap: () {
-                  widget.onSportSelected(sport);
-                  Navigator.pop(context);
-                },
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Select Sport',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              ..._sportTemplates.map(
+                (sport) => ListTile(
+                  title: Text(sport.name),
+                  subtitle: Text(sport.segmentLabel),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (sport.segmentType == MatchSegmentType.sets) ...[
+                        const Tooltip(
+                          message: 'Number of sets',
+                          child: Text('Sets'),
+                        ),
+                        DropdownButton<int>(
+                          key: ValueKey('set-count-${sport.name}'),
+                          value: sport.segmentCount,
+                          isDense: true,
+                          underline: const SizedBox.shrink(),
+                          items: _availableSetCounts
+                              .map(
+                                (count) => DropdownMenuItem(
+                                  value: count,
+                                  child: Text('$count'),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (count) {
+                            if (count != null) {
+                              _changeSegmentCount(sport, count);
+                            }
+                          },
+                        ),
+                      ],
+                      if (widget.selectedSport.name == sport.name)
+                        const Icon(Icons.check_circle, color: Colors.green),
+                    ],
+                  ),
+                  onTap: () {
+                    widget.onSportSelected(sport);
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

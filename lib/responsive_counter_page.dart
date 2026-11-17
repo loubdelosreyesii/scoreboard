@@ -295,6 +295,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
   void _showSportTemplateDialog() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       showDragHandle: true,
       builder: (context) => SportSelectionSheet(
         sportTemplates: _sportTemplates,

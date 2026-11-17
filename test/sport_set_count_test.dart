@@ -4,6 +4,7 @@ import 'package:scoreboard/data/sport_templates.dart';
 import 'package:scoreboard/responsive_counter_page.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:scoreboard/widgets/sport_selection_sheet.dart';
 
 void main() {
   setUp(() {
@@ -96,6 +97,54 @@ void main() {
       find.text('Best of 7 Sets  •  First to 21  •  Win by 2'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('sport selection scrolls on short screens without overflow', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(420, 360);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    showDragHandle: true,
+                    builder: (context) => SportSelectionSheet(
+                      sportTemplates: [
+                        tableTennisTemplate,
+                        badmintonTemplate,
+                        volleyballTemplate,
+                      ],
+                      selectedSport: tableTennisTemplate,
+                      onSportSelected: (_) {},
+                      onSegmentCountChanged: (_, _) async => false,
+                    ),
+                  );
+                },
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    await tester.ensureVisible(find.text('Volleyball'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 }
 
