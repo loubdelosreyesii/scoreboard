@@ -113,7 +113,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
   }
 
   void _incrementRed() {
-    if (_areAllSetsComplete) return;
+    if (_isMatchComplete) return;
 
     setState(() {
       _redCount++;
@@ -122,7 +122,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
   }
 
   void _incrementBlue() {
-    if (_areAllSetsComplete) return;
+    if (_isMatchComplete) return;
 
     setState(() {
       _blueCount++;
@@ -150,10 +150,17 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
     }
   }
 
-  bool get _areAllSetsComplete =>
-      _selectedSport.segmentType == MatchSegmentType.sets &&
-      _selectedSport.segmentCount > 0 &&
-      _completedSegments.length >= _selectedSport.segmentCount;
+  bool get _isMatchComplete {
+    if (_selectedSport.segmentType != MatchSegmentType.sets ||
+        _selectedSport.segmentCount <= 0) {
+      return false;
+    }
+
+    final setsToWin = _selectedSport.segmentCount ~/ 2 + 1;
+    return _redSegmentsWon >= setsToWin ||
+        _blueSegmentsWon >= setsToWin ||
+        _completedSegments.length >= _selectedSport.segmentCount;
+  }
 
   void _completeSetIfWon() {
     if (_selectedSport.segmentType != MatchSegmentType.sets ||
@@ -583,7 +590,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
                 currentRedScore: _redCount,
                 currentBlueScore: _blueCount,
                 completedSegments: _completedSegments,
-                allSetsComplete: _areAllSetsComplete,
+                matchComplete: _isMatchComplete,
                 timerKey: _timerKey,
                 onSportTap: _showSportTemplateDialog,
                 onFullscreenTap: _toggleFullscreen,
@@ -785,7 +792,7 @@ class _CenterConsole extends StatelessWidget {
   final int currentRedScore;
   final int currentBlueScore;
   final List<_SegmentScore> completedSegments;
-  final bool allSetsComplete;
+  final bool matchComplete;
   final GlobalKey<_MatchTimerState> timerKey;
   final VoidCallback onSportTap;
   final VoidCallback onFullscreenTap;
@@ -799,7 +806,7 @@ class _CenterConsole extends StatelessWidget {
     required this.currentRedScore,
     required this.currentBlueScore,
     required this.completedSegments,
-    required this.allSetsComplete,
+    required this.matchComplete,
     required this.timerKey,
     required this.onSportTap,
     required this.onFullscreenTap,
@@ -961,8 +968,8 @@ class _CenterConsole extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
       ),
       child: Text(
-        allSetsComplete
-            ? 'ALL SETS COMPLETE'
+        matchComplete
+            ? 'MATCH COMPLETE'
             : '${_segmentSingular.toUpperCase()} '
                   '$currentSegment OF ${selectedSport.segmentCount}',
         style: const TextStyle(
@@ -1089,7 +1096,9 @@ class _CenterConsole extends StatelessWidget {
           final segmentNumber = index + 1;
           final hasCompletedScore = index < completedSegments.length;
           final isCurrentSegment =
-              segmentNumber == currentSegment && !hasCompletedScore;
+              segmentNumber == currentSegment &&
+              !hasCompletedScore &&
+              !matchComplete;
           final completedScore = hasCompletedScore
               ? completedSegments[index]
               : null;

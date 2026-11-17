@@ -53,6 +53,37 @@ void main() {
       greaterThan(tester.getCenter(find.text('0 - 11')).dx),
     );
   });
+
+  testWidgets('best-of-five match ends when a team wins three sets', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = 0.5;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(const MaterialApp(home: ResponsiveCounterPage()));
+
+    const leftScorePosition = Offset(200, 400);
+    const rightScorePosition = Offset(1000, 400);
+
+    for (var set = 0; set < 3; set++) {
+      await _tapScore(tester, leftScorePosition, 11);
+    }
+
+    expect(find.text('MATCH COMPLETE'), findsOneWidget);
+    expect(find.text('SET 4 OF 5'), findsNothing);
+    expect(find.text('11 - 0'), findsNWidgets(3));
+
+    await _tapScore(tester, rightScorePosition, 1);
+
+    expect(find.text('MATCH COMPLETE'), findsOneWidget);
+    expect(find.text('SET 4 OF 5'), findsNothing);
+    expect(find.text('11 - 0'), findsNWidgets(3));
+    expect(find.text('0 - 0'), findsOneWidget);
+  });
 }
 
 Future<void> _tapScore(WidgetTester tester, Offset position, int count) async {
