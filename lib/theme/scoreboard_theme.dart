@@ -7,9 +7,10 @@ const LinearGradient scoreboardBackgroundGradient = LinearGradient(
 );
 
 const Color scoreboardBackgroundBorderColor = Color(0xFF243B5C);
-const Color scoreboardDialogBackgroundColor = Color(0xFF0B1B2E);
-const Color scoreboardDialogSurfaceColor = Color(0xFF10243A);
-const Color scoreboardDialogBorderColor = Color(0xFF294663);
-const Color scoreboardDialogTextColor = Color(0xFFE7EDF7);
-const Color scoreboardDialogMutedTextColor = Color(0xFF91A4BC);
+const Color scoreboardDialogBackgroundColor = Color(0xFFFFFFFF);
+const Color scoreboardDialogSurfaceColor = Color(0xFFF3F6FA);
+const Color scoreboardDialogBorderColor = Color(0xFFD5DDE8);
+const Color scoreboardDialogTextColor = Color(0xFF15243A);
+const Color scoreboardDialogMutedTextColor = Color(0xFF61738A);
+const Color scoreboardHeaderTextColor = Color(0xFFE7EDF7);
 const Color scoreboardAccentColor = Color(0xFF0CBE78);

@@ -56,10 +56,8 @@ class _SportSelectionSheetState extends State<SportSelectionSheet> {
     return SafeArea(
       child: Container(
         decoration: const BoxDecoration(
-          gradient: scoreboardBackgroundGradient,
-          border: Border(
-            top: BorderSide(color: scoreboardBackgroundBorderColor),
-          ),
+          color: scoreboardDialogBackgroundColor,
+          border: Border(top: BorderSide(color: scoreboardDialogBorderColor)),
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SingleChildScrollView(
@@ -72,7 +70,7 @@ class _SportSelectionSheetState extends State<SportSelectionSheet> {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF91A4BC),
+                    color: scoreboardDialogBorderColor,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -109,7 +107,7 @@ class _SportSelectionSheetState extends State<SportSelectionSheet> {
                       icon: const Icon(
                         Icons.close,
                         size: 19,
-                        color: Color(0xFFB8C6D9),
+                        color: scoreboardDialogMutedTextColor,
                       ),
                     ),
                   ],

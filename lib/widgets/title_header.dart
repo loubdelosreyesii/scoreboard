@@ -68,12 +68,12 @@ class _TitleHeaderState extends State<TitleHeader> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: compact ? 13 : 17, color: scoreboardDialogTextColor),
+        Icon(icon, size: compact ? 13 : 17, color: scoreboardHeaderTextColor),
         SizedBox(width: compact ? 4 : 7),
         Text(
           text,
           style: TextStyle(
-            color: scoreboardDialogTextColor,
+            color: scoreboardHeaderTextColor,
             fontSize: compact ? 10 : 15,
             fontWeight: FontWeight.w500,
           ),
@@ -114,7 +114,7 @@ class _TitleHeaderState extends State<TitleHeader> {
         const SizedBox(width: 12),
         const Text(
           '•',
-          style: TextStyle(color: scoreboardDialogTextColor, fontSize: 15),
+          style: TextStyle(color: scoreboardHeaderTextColor, fontSize: 15),
         ),
         const SizedBox(width: 12),
         metadata[_venue.isEmpty ? 1 : 2],
@@ -333,7 +333,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                           const Text(
                             'Edit tournament header',
                             style: TextStyle(
-                              color: Color(0xFFF2F5FA),
+                              color: scoreboardDialogTextColor,
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                             ),
@@ -341,8 +341,8 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                           const SizedBox(height: 3),
                           Text(
                             'Update the details shown above your scoreboard.',
-                            style: TextStyle(
-                              color: Colors.blueGrey.shade200,
+                            style: const TextStyle(
+                              color: scoreboardDialogMutedTextColor,
                               fontSize: 12,
                             ),
                           ),
@@ -356,7 +356,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                       icon: const Icon(
                         Icons.close,
                         size: 19,
-                        color: Color(0xFFB8C6D9),
+                        color: scoreboardDialogMutedTextColor,
                       ),
                     ),
                   ],
@@ -408,8 +408,8 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                       const SizedBox(height: 6),
                       Text(
                         'Location, date and time appear as the subtitle.',
-                        style: TextStyle(
-                          color: Colors.blueGrey.shade300,
+                        style: const TextStyle(
+                          color: scoreboardDialogMutedTextColor,
                           fontSize: 10,
                         ),
                       ),
@@ -424,14 +424,17 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                         ),
                       ],
                       const SizedBox(height: 13),
-                      const Divider(color: Color(0xFF243B54), height: 1),
+                      const Divider(
+                        color: scoreboardDialogBorderColor,
+                        height: 1,
+                      ),
                       const SizedBox(height: 12),
                       _buildVisibilityToggle(),
                     ],
                   ),
                 ),
               ),
-              const Divider(color: Color(0xFF243B54), height: 1),
+              const Divider(color: scoreboardDialogBorderColor, height: 1),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
                 child: Row(
@@ -440,8 +443,10 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFFE5ECF5),
-                          side: const BorderSide(color: Color(0xFF385675)),
+                          foregroundColor: scoreboardDialogTextColor,
+                          side: const BorderSide(
+                            color: scoreboardDialogBorderColor,
+                          ),
                           minimumSize: const Size.fromHeight(38),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -485,7 +490,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
       decoration: BoxDecoration(
         color: scoreboardDialogSurfaceColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF203B59)),
+        border: Border.all(color: scoreboardDialogBorderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -495,7 +500,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
             child: Text(
               'LIVE PREVIEW',
               style: TextStyle(
-                color: Color(0xFF91A9C6),
+                color: scoreboardDialogMutedTextColor,
                 fontSize: 9,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.7,
@@ -512,7 +517,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
               children: [
                 const Icon(
                   Icons.emoji_events_rounded,
-                  color: Colors.white,
+                  color: scoreboardDialogTextColor,
                   size: 28,
                 ),
                 const SizedBox(width: 12),
@@ -527,7 +532,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: Color(0xFFF0F3F8),
+                          color: scoreboardDialogTextColor,
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                         ),
@@ -615,7 +620,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
             prefixIcon: const Icon(
               Icons.location_on_rounded,
               size: 16,
-              color: Color(0xFFB8C6D9),
+              color: scoreboardDialogMutedTextColor,
             ),
           ),
         ),
@@ -637,7 +642,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(6),
-        borderSide: const BorderSide(color: Color(0xFF4E83B5)),
+        borderSide: const BorderSide(color: Color(0xFF4F86C6)),
       ),
     );
   }
@@ -668,7 +673,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
               ),
               child: Row(
                 children: [
-                  Icon(icon, size: 15, color: const Color(0xFFB8C6D9)),
+                  Icon(icon, size: 15, color: scoreboardDialogMutedTextColor),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -707,7 +712,10 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
               const SizedBox(height: 3),
               Text(
                 'Visible in operator and display modes.',
-                style: TextStyle(color: Colors.blueGrey.shade300, fontSize: 10),
+                style: const TextStyle(
+                  color: scoreboardDialogMutedTextColor,
+                  fontSize: 10,
+                ),
               ),
             ],
           ),
@@ -717,7 +725,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
           activeThumbColor: Colors.white,
           activeTrackColor: scoreboardAccentColor,
           inactiveThumbColor: Colors.white,
-          inactiveTrackColor: const Color(0xFF52657A),
+          inactiveTrackColor: const Color(0xFFD5DDE8),
           onChanged: (show) => setState(() => _showHeader = show),
         ),
       ],
@@ -773,7 +781,7 @@ class _EditFieldLabel extends StatelessWidget {
     return RichText(
       text: TextSpan(
         style: const TextStyle(
-          color: Color(0xFFCBD6E4),
+          color: scoreboardDialogMutedTextColor,
           fontSize: 11,
           fontWeight: FontWeight.w500,
         ),
