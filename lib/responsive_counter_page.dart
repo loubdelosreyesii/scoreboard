@@ -5,6 +5,7 @@ import 'enums/match_segment_type.dart';
 import 'models/sport_template.dart';
 import 'data/sport_templates.dart';
 import 'models/segment_score.dart';
+import 'theme/scoreboard_theme.dart';
 import 'widgets/center_console.dart';
 import 'widgets/counter_box.dart';
 import 'widgets/match_timer.dart';
@@ -296,7 +297,7 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      showDragHandle: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => SportSelectionSheet(
         sportTemplates: _sportTemplates,
         selectedSport: _selectedSport,
@@ -327,12 +328,27 @@ class _ResponsiveCounterPageState extends State<ResponsiveCounterPage> {
             'Changing the number of sets will reset the current scores, '
             'set history, and timer.',
           ),
+          backgroundColor: scoreboardDialogBackgroundColor,
+          surfaceTintColor: Colors.transparent,
+          titleTextStyle: const TextStyle(
+            color: scoreboardDialogTextColor,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
+          contentTextStyle: const TextStyle(
+            color: scoreboardDialogMutedTextColor,
+            fontSize: 14,
+          ),
           shape: RoundedRectangleBorder(
+            side: const BorderSide(color: scoreboardDialogBorderColor),
             borderRadius: BorderRadius.circular(16),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
+              style: TextButton.styleFrom(
+                foregroundColor: scoreboardDialogMutedTextColor,
+              ),
               child: const Text('Cancel'),
             ),
             ElevatedButton(

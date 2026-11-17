@@ -68,12 +68,12 @@ class _TitleHeaderState extends State<TitleHeader> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: compact ? 13 : 17, color: const Color(0xFFE7EDF7)),
+        Icon(icon, size: compact ? 13 : 17, color: scoreboardDialogTextColor),
         SizedBox(width: compact ? 4 : 7),
         Text(
           text,
           style: TextStyle(
-            color: const Color(0xFFE7EDF7),
+            color: scoreboardDialogTextColor,
             fontSize: compact ? 10 : 15,
             fontWeight: FontWeight.w500,
           ),
@@ -114,7 +114,7 @@ class _TitleHeaderState extends State<TitleHeader> {
         const SizedBox(width: 12),
         const Text(
           '•',
-          style: TextStyle(color: Color(0xFFE7EDF7), fontSize: 15),
+          style: TextStyle(color: scoreboardDialogTextColor, fontSize: 15),
         ),
         const SizedBox(width: 12),
         metadata[_venue.isEmpty ? 1 : 2],
@@ -307,9 +307,9 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
         child: Container(
           width: 480,
           decoration: BoxDecoration(
-            color: const Color(0xFF0B1B2E),
+            color: scoreboardDialogBackgroundColor,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFF294663)),
+            border: Border.all(color: scoreboardDialogBorderColor),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x66000000),
@@ -376,7 +376,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                         child: Text(
                           '${_titleController.text.length}/80',
                           style: const TextStyle(
-                            color: Color(0xFF91A4BC),
+                            color: scoreboardDialogMutedTextColor,
                             fontSize: 10,
                           ),
                         ),
@@ -455,7 +455,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                       child: ElevatedButton(
                         onPressed: _save,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0CBE78),
+                          backgroundColor: scoreboardAccentColor,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           minimumSize: const Size.fromHeight(38),
@@ -483,7 +483,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 9),
       decoration: BoxDecoration(
-        color: const Color(0xFF10243A),
+        color: scoreboardDialogSurfaceColor,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFF203B59)),
       ),
@@ -505,7 +505,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF0B1B2E),
+              color: scoreboardDialogBackgroundColor,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Row(
@@ -567,11 +567,11 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 11, color: const Color(0xFFE7EDF7)),
+        Icon(icon, size: 11, color: scoreboardDialogTextColor),
         const SizedBox(width: 3),
         Text(
           text,
-          style: const TextStyle(color: Color(0xFFE7EDF7), fontSize: 9),
+          style: TextStyle(color: scoreboardDialogTextColor, fontSize: 9),
         ),
       ],
     );
@@ -587,7 +587,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
           controller: _titleController,
           maxLength: 80,
           onChanged: (_) => setState(() => _validationMessage = null),
-          style: const TextStyle(color: Color(0xFFE7EDF7), fontSize: 12),
+          style: TextStyle(color: scoreboardDialogTextColor, fontSize: 12),
           buildCounter:
               (
                 context, {
@@ -610,7 +610,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
         TextField(
           controller: _venueController,
           onChanged: (_) => setState(() {}),
-          style: const TextStyle(color: Color(0xFFE7EDF7), fontSize: 12),
+          style: TextStyle(color: scoreboardDialogTextColor, fontSize: 12),
           decoration: _fieldDecoration(
             prefixIcon: const Icon(
               Icons.location_on_rounded,
@@ -629,11 +629,11 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
       counterText: '',
       isDense: true,
       filled: true,
-      fillColor: const Color(0xFF0B1B2E),
+      fillColor: scoreboardDialogBackgroundColor,
       contentPadding: const EdgeInsets.symmetric(horizontal: 11, vertical: 11),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(6),
-        borderSide: const BorderSide(color: Color(0xFF294663)),
+        borderSide: BorderSide(color: scoreboardDialogBorderColor),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(6),
@@ -654,7 +654,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
         _EditFieldLabel(text: label),
         const SizedBox(height: 5),
         Material(
-          color: const Color(0xFF0B1B2E),
+          color: scoreboardDialogBackgroundColor,
           borderRadius: BorderRadius.circular(6),
           child: InkWell(
             onTap: onTap,
@@ -664,7 +664,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFF294663)),
+                border: Border.all(color: scoreboardDialogBorderColor),
               ),
               child: Row(
                 children: [
@@ -675,7 +675,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
                       value,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: Color(0xFFE7EDF7),
+                        color: scoreboardDialogTextColor,
                         fontSize: 11,
                       ),
                     ),
@@ -699,7 +699,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
               const Text(
                 'Show tournament header',
                 style: TextStyle(
-                  color: Color(0xFFE7EDF7),
+                  color: scoreboardDialogTextColor,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -715,7 +715,7 @@ class _TitleHeaderEditDialogState extends State<_TitleHeaderEditDialog> {
         Switch(
           value: _showHeader,
           activeThumbColor: Colors.white,
-          activeTrackColor: const Color(0xFF0CBE78),
+          activeTrackColor: scoreboardAccentColor,
           inactiveThumbColor: Colors.white,
           inactiveTrackColor: const Color(0xFF52657A),
           onChanged: (show) => setState(() => _showHeader = show),

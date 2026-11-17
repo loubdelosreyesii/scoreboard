@@ -117,7 +117,7 @@ void main() {
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
-                    showDragHandle: true,
+                    backgroundColor: Colors.transparent,
                     builder: (context) => SportSelectionSheet(
                       sportTemplates: [
                         tableTennisTemplate,
