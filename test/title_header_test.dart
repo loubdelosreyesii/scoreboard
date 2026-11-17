@@ -27,10 +27,49 @@ void main() {
 
     await tester.enterText(find.byType(TextField).first, 'CITY CUP 2027');
     await tester.enterText(find.byType(TextField).last, 'Araneta Coliseum');
-    await tester.tap(find.text('Save'));
+    expect(find.text('CITY CUP 2027'), findsNWidgets(2));
+    await tester.tap(find.text('Save changes'));
     await tester.pumpAndSettle();
 
     expect(find.text('CITY CUP 2027'), findsOneWidget);
     expect(find.text('Araneta Coliseum'), findsOneWidget);
+  });
+
+  testWidgets('header visibility can be toggled off and back on', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              TitleHeader(),
+              Expanded(child: SizedBox()),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byTooltip('Edit match details'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byType(Switch));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Switch));
+    await tester.ensureVisible(find.text('Save changes'));
+    await tester.tap(find.text('Save changes'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('CITY TABLE TENNIS CUP 2026'), findsNothing);
+    await tester.tap(find.byTooltip('Edit tournament header'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byType(Switch));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(Switch));
+    await tester.ensureVisible(find.text('Save changes'));
+    await tester.tap(find.text('Save changes'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('CITY TABLE TENNIS CUP 2026'), findsOneWidget);
   });
 }
