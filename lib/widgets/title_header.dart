@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/scoreboard_theme.dart';
+
 const List<String> _months = [
   'Jan',
   'Feb',
@@ -179,13 +181,9 @@ class _TitleHeaderState extends State<TitleHeader> {
             right: compact ? 14 : 8,
           ),
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Color(0xFF09172D), Color(0xFF10284B), Color(0xFF09172D)],
-            ),
+            gradient: scoreboardBackgroundGradient,
             border: Border(
-              bottom: BorderSide(color: Color(0xFF243B5C), width: 1),
+              bottom: BorderSide(color: scoreboardBackgroundBorderColor),
             ),
           ),
           child: Row(

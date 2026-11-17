@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../enums/match_segment_type.dart';
 import '../models/segment_score.dart';
 import '../models/sport_template.dart';
+import '../theme/scoreboard_theme.dart';
 import 'match_timer.dart';
 
 class CenterConsole extends StatelessWidget {
@@ -93,8 +94,8 @@ class CenterConsole extends StatelessWidget {
         ? selectedSport.segmentCount
         : 1;
 
-    return ColoredBox(
-      color: const Color(0xFF07141E),
+    return DecoratedBox(
+      decoration: const BoxDecoration(gradient: scoreboardBackgroundGradient),
       child: SafeArea(
         left: false,
         right: false,
